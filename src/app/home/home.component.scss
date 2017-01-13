@@ -1,0 +1,18 @@
+// component styles are encapsulated and only applied to their components
+
+.textarea-search {
+  resize: none;
+  border-radius: 0;
+  border-left: none;
+  border-right: none;
+}
+
+.text-answer {
+  border-radius: 0;
+  border-left: none;
+}
+
+.btn-answer {
+  border-radius: 0;
+  border-right: none;  
+}

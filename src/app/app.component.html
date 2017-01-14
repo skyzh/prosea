@@ -1,8 +1,15 @@
 <header>
-  <nav class="navbar navbar-light bg-faded">
-    <a class="navbar-brand">思海</a>
-  </nav>
+  <nav class="navbar navbar-toggleable-md navbar-light bg-faded">
+    <a class="navbar-brand" href="#">思海</a>
+    <ul class="navbar-nav mr-auto">
+    </ul>
+    <span class="navbar-text">
+      <span *ngIf="db_status == 0"><i class="fa fa-circle-o-notch fa-spin fa-fw" aria-hidden="true"></i> 同步数据中...</span>
+      <span *ngIf="db_status == 1"><i class="fa fa-check fa-fw" aria-hidden="true"></i> 同步完成</span>
+    </span>
+  </nav>  
 </header>
+
 <main>
   <router-outlet></router-outlet>
 </main>

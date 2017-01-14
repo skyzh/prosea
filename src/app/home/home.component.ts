@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { DBService } from '../shared';
 
 @Component({
   selector: 'my-home',
@@ -7,8 +8,8 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
-  constructor() {
-    // Do stuff
+  constructor(private db: DBService) {
+   
   }
 
   ngOnInit() {

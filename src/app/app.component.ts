@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { ApiService } from './shared';
+import { ApiService, DBService, DB_STATUS } from './shared';
 
 import '../style/app.scss';
 
@@ -12,7 +12,11 @@ import '../style/app.scss';
 export class AppComponent {
   url = 'https://github.com/preboot/angular2-webpack';
 
-  constructor(private api: ApiService) {
-    // Do something with api
+  private db_status: number = 0;
+
+  constructor(private api: ApiService, private db: DBService) {
+    db.active$.subscribe(() => this.db_status = 0);
+    db.paused$.subscribe((err) => this.db_status = 1);
+    db.change$.subscribe((info) => db.fetch().subscribe((info) => console.log(info)));
   }
 }

@@ -17,6 +17,5 @@ export class AppComponent {
   constructor(private api: ApiService, private db: DBService) {
     db.active$.subscribe(() => this.db_status = 0);
     db.paused$.subscribe((err) => this.db_status = 1);
-    db.change$.subscribe((info) => db.fetch().subscribe((info) => console.log(info)));
   }
 }

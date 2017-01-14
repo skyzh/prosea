@@ -6,36 +6,48 @@
           <h4 class="card-title">搜索</h4>
           <h6 class="card-subtitle mb-2 text-muted">将您的试题复制到下面的大文本框，即可自动开始检索。</h6>
         </div>
-        <div class="form-group has-success">
-          <textarea class="form-control textarea-search" rows="5" placeholder="试题"></textarea>
+        <div class="form-group" [ngClass]="{ 'has-success': query_status >= 2, 'has-info': query_status == 1 }">
+          <textarea class="form-control textarea-search" rows="5" placeholder="试题" [(ngModel)]="_problem" (ngModelChange)="searchProblem()"></textarea>
         </div>
-        <div class="input-group has-success">
-          <input type="text" class="form-control form-control-success text-answer" placeholder="答案">
+        <div class="input-group" [ngClass]="{ 'has-success': query_status == 3, 'has-warning': answer.invalid }" *ngIf="query_status >= 2">
+          <input type="text"
+                 class="form-control form-control-success text-answer"
+                 [ngClass]="{ 'form-control-success': query_status == 3, 'form-control-warning': answer.invalid }"
+                 [(ngModel)]="_answer"
+                 (ngModelChange)="setAnswer()"
+                 name="answer"
+                 id="answer"
+                 #answer="ngModel"
+                 placeholder="答案"
+                 required>
           <span class="input-group-btn">
-            <button class="btn btn-secondary btn-answer" type="button"><i class="fa fa-plus" aria-hidden="true"></i></button>
+            <button class="btn btn-secondary btn-answer" type="button" [disabled]="this.query_status == 3 || answer.invalid" (click)="submitAnswer()"><i class="fa fa-plus" aria-hidden="true"></i></button>
           </span>
         </div>
         <div class="card-block">
           <span class="text-muted">
-            <span><i class="fa fa-circle-o-notch fa-spin fa-fw" aria-hidden="true"></i> 检索中，请稍后……</span><br>
-            <span><i class="fa fa-exclamation-circle fa-fw" aria-hidden="true"></i> 检索完毕。您还可以添加自己的答案。</span><br>
-            <span><i class="fa fa-check-square fa-fw" aria-hidden="true"></i> 您的答案已经添加成功。</span>
+            <span *ngIf="query_status == 1"><i class="fa fa-circle-o-notch fa-spin fa-fw" aria-hidden="true"></i> 检索中，请稍后……</span>
+            <span *ngIf="query_status == 2"><i class="fa fa-exclamation-circle fa-fw" aria-hidden="true"></i> 检索完毕。您可以添加新的答案。</span>
+            <span *ngIf="query_status == 3"><i class="fa fa-check-square fa-fw" aria-hidden="true"></i> 您的答案已经成功添加。</span>
           </span>
         </div>
 
       </div>
     </div>
     <div class="col-md-8">
-      <h1 class="mb-3">结果</h1>
+      <h1 class="mb-3">结果 <i class="fa fa-circle-o-notch fa-spin fa-fw" aria-hidden="true" *ngIf="query_status == 1"></i></h1>
       <div class="card-columns">
-        <div class="card" *ngFor="let id of [0, 1, 2, 3, 4, 5]">
+        <div class="card" *ngFor="let result of _result">
           <div class="card-block">
-            <h4 class="card-title">#{{ id }}</h4>
-            <p>我是 23333</p>
-            <h6 class="card-subtitle text-muted">答案为 122</h6>
+            <h4 class="card-title">答案：{{ result.answer }}</h4>
+            <p>{{ result.problem }}</p>
+            <h6 class="card-subtitle text-muted"><small>添加于 {{ result.time | amDateFormat:'hh:mm:ss' }} ({{ result.time | amTimeAgo }})</small></h6>
           </div>
         </div>
       </div>
-    </div>      
+      <div>
+        <span class="text-muted">数据库中共有 {{ __data_size }} 条记录。</span>
+      </div>
+    </div>
   </div>
 </div>

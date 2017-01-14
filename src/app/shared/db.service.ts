@@ -4,6 +4,10 @@ import { ApiService } from './api.service';
 import * as PouchDB from 'pouchdb';
 import * as _ from 'lodash';
 
+interface SocketConfiguration extends PouchDB.Configuration.CommonDatabaseConfiguration {
+  url: string
+};
+
 @Injectable()
 export class DBService {
 
@@ -39,8 +43,13 @@ export class DBService {
   }
   public constructor(private api: ApiService) {
     if(!this.database) {
+      PouchDB['adapter']('socket', require('socket-pouch/client'));
       this.database = new PouchDB(api.db.local_name);
-      this.remote_db = new PouchDB(api.db.remote_address + '/' + api.db.remote_name);
+      console.log("ws://" + api.db.remote_address)
+      this.remote_db = new PouchDB(api.db.remote_name, <SocketConfiguration>{
+        adapter: 'socket',
+        url: "ws://" + api.db.remote_address + "/"
+      });
       let _sync = this.database.sync(this.remote_db, {
         live: true,
         retry: true
@@ -80,6 +89,10 @@ export class DBService {
 
   public put(id: string, document: any): Observable<any> {
     return Observable.fromPromise(this._put(id, document));
+  }
+
+  public post(document: any): Observable<any> {
+    return Observable.fromPromise(this.database.post(document));
   }
 
   public fetch(): Observable<any> {

@@ -6,6 +6,6 @@ export class ApiService {
   db = {
     local_name: "prosea_local",
     remote_name: "prosea_main",
-    remote_address: "http://localhost:5984/"
+    remote_address: "localhost:5984"
   }
 }

@@ -20,4 +20,3 @@ import '@ng-bootstrap/ng-bootstrap';
 import 'fast-levenshtein';
 import 'moment';
 import 'angular2-moment';
-import 'socket-pouch/client';

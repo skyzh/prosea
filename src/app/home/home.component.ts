@@ -18,6 +18,7 @@ export class HomeComponent implements OnInit {
   private _answer: string = "";
   private query_status: number = 0;
   private query_subscription: any = null;
+  private db_status: number = 0;
 
   get _data(): any {
     return this.__data;
@@ -31,6 +32,8 @@ export class HomeComponent implements OnInit {
   constructor(private db: DBService) {
     db.fetch().subscribe((data) => this._data = data);
     db.change$.subscribe((info) => db.fetch().subscribe((data) => this._data = data));
+    db.active$.subscribe(() => this.db_status = 0);
+    db.pull_paused$.subscribe(err => this.db_status = err ? 2 : 1);
   }
 
   ngOnInit() {
@@ -49,7 +52,7 @@ export class HomeComponent implements OnInit {
           this._result = _.chain(this.__data.rows)
             .map((r) => _.merge(r.doc, { 'distance': leven.get(r.doc.problem, problem)}))
             .sortBy('distance')
-            .take(10)
+            .take(5)
             .value();
           this.query_status = 2;
         });

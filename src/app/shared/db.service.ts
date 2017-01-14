@@ -4,10 +4,6 @@ import { ApiService } from './api.service';
 import * as PouchDB from 'pouchdb';
 import * as _ from 'lodash';
 
-interface SocketConfiguration extends PouchDB.Configuration.CommonDatabaseConfiguration {
-  url: string
-};
-
 @Injectable()
 export class DBService {
 
@@ -22,6 +18,9 @@ export class DBService {
   get paused$(): Observable<any> {
     return this._observables.paused;
   }
+  get pull_paused$(): Observable<any> {
+    return this._observables.pull_paused;
+  }
   get active$(): Observable<any> {
     return this._observables.active;
   }
@@ -34,28 +33,35 @@ export class DBService {
   get error$(): Observable<any> {
     return this._observables.error;
   }
+  get requestError$(): Observable<any> {
+    return this._observables.pull_requestError;
+  }
 
-  private bindEventListener(sync: any, name: string) {
-    this._observables[name] = Observable.fromEventPattern(
+  private bindEventListener(sync: any, name: string, prefix: string) {
+    this._observables[prefix + name] = Observable.fromEventPattern(
       (h) => sync.on(name, h),
       (h) => sync.off(name, h)
     );
   }
+
+  public connect() {
+    let _sync = this.database.sync(this.remote_db, {
+      live: true,
+      retry: true,
+      back_off_function: (delay) => 1000
+    });
+    _(['change', 'paused', 'active', 'denied', 'complete', 'error'])
+      .forEach((name) => this.bindEventListener(_sync, name, ""));
+    _(['change', 'paused', 'active', 'denied', 'complete', 'error', 'requestError'])
+      .forEach((name) => this.bindEventListener(_sync.push, name, "push_"));
+    _(['change', 'paused', 'active', 'denied', 'complete', 'error', 'requestError'])
+      .forEach((name) => this.bindEventListener(_sync.pull, name, "pull_"));
+  }
   public constructor(private api: ApiService) {
     if(!this.database) {
-      PouchDB['adapter']('socket', require('socket-pouch/client'));
       this.database = new PouchDB(api.db.local_name);
-      console.log("ws://" + api.db.remote_address)
-      this.remote_db = new PouchDB(api.db.remote_name, <SocketConfiguration>{
-        adapter: 'socket',
-        url: "ws://" + api.db.remote_address + "/"
-      });
-      let _sync = this.database.sync(this.remote_db, {
-        live: true,
-        retry: true
-      });
-      _(['change', 'paused', 'active', 'denied', 'complete', 'error'])
-        .forEach((name) => this.bindEventListener(_sync, name));
+      this.remote_db = new PouchDB("http://" + api.db.remote_address + "/" + api.db.remote_name);
+      this.connect();
     }
   }
 

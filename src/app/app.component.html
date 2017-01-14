@@ -4,8 +4,9 @@
     <ul class="navbar-nav mr-auto">
     </ul>
     <span class="navbar-text">
-      <span *ngIf="db_status == 0"><i class="fa fa-circle-o-notch fa-spin fa-fw" aria-hidden="true"></i> 同步数据中...</span>
-      <span *ngIf="db_status == 1"><i class="fa fa-check" aria-hidden="true"></i> 已同步最新题目数据</span>
+      <span *ngIf="db_status == 0"><i class="fa fa-circle-o-notch fa-spin fa-fw" aria-hidden="true"></i> 同步数据中……</span>
+      <span *ngIf="db_status == 1"><i class="fa fa-check" aria-hidden="true"></i> 已同步最新数据</span>
+      <span *ngIf="db_status == 2"><i class="fa fa-exclamation-circle" aria-hidden="true"></i> 与服务器失去连接</span>
     </span>
   </nav>  
 </header>

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import { Observable } from 'rxjs';
 import { ApiService, DBService, DB_STATUS } from './shared';
 
 import '../style/app.scss';
@@ -16,6 +16,6 @@ export class AppComponent {
 
   constructor(private api: ApiService, private db: DBService) {
     db.active$.subscribe(() => this.db_status = 0);
-    db.paused$.subscribe((err) => this.db_status = 1);
+    db.pull_paused$.subscribe(err => this.db_status = err ? 2 : 1);
   }
 }

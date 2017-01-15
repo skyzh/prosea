@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs';
 import { DBService } from '../shared';
+import { NgbModal, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
 import * as leven from 'fast-levenshtein';
 import * as _ from 'lodash';
 
@@ -29,11 +30,13 @@ export class HomeComponent implements OnInit {
     this.__data_size = data.total_rows;
   }
 
-  constructor(private db: DBService) {
+  constructor(private db: DBService, private modalService: NgbModal) {
     db.fetch().subscribe((data) => this._data = data);
-    db.change$.subscribe((info) => db.fetch().subscribe((data) => this._data = data));
     db.active$.subscribe(() => this.db_status = 0);
-    db.pull_paused$.subscribe(err => this.db_status = err ? 2 : 1);
+    db.pull_paused$.subscribe(err => {
+      this.db_status = err ? 2 : 1;
+      db.fetch().subscribe((data) => this._data = data);
+    });
   }
 
   ngOnInit() {
@@ -47,12 +50,12 @@ export class HomeComponent implements OnInit {
     if (problem.length >= 5) {
       this.query_subscription = Observable
         .of(problem)
-        .delay(300)
+        .delay(500)
         .subscribe(d => {
           this._result = _.chain(this.__data.rows)
             .map((r) => _.merge(r.doc, { 'distance': leven.get(r.doc.problem, problem)}))
             .sortBy('distance')
-            .take(5)
+            .take(8)
             .value();
           this.query_status = 2;
         });
@@ -77,5 +80,19 @@ export class HomeComponent implements OnInit {
 
   private setAnswer() {
     this.query_status = 2;
+  }
+
+  private clearDatabase() {
+    this.db.clear().subscribe(e => window.location.reload());
+  }
+
+  private openClearPrompt(content) {
+    this.modalService.open(content).result.then((result) => {
+      if (result == 'OK') {
+        this.clearDatabase();
+      }
+    }, (reason) => {
+      console.log(`Dismissed 233`);
+    });
   }
 }

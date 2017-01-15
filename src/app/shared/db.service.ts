@@ -60,7 +60,7 @@ export class DBService {
   public constructor(private api: ApiService) {
     if(!this.database) {
       this.database = new PouchDB(api.db.local_name);
-      this.remote_db = new PouchDB("http://" + api.db.remote_address + "/" + api.db.remote_name);
+      this.remote_db = new PouchDB(`http://${api.db.remote_address}/${api.db.remote_name}`);
       this.connect();
     }
   }
@@ -105,6 +105,9 @@ export class DBService {
     return Observable.fromPromise(this._fetch());
   }
 
+  public clear(): Observable<any> {
+    return Observable.fromPromise(this.database.destroy());
+  }
 }
 
 export const DB_STATUS = [

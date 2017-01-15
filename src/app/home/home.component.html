@@ -46,8 +46,29 @@
         </div>
       </div>
       <div>
-        <span class="text-muted">本地数据库中共有 {{ __data_size }} 条记录。</span>
+        <span class="text-muted">
+          本地数据库中共有 {{ __data_size }}
+          <i class="fa fa-circle-o-notch fa-spin fa-fw" aria-hidden="true" *ngIf="db_status == 0"></i>
+          <i class="fa fa-exclamation-circle" aria-hidden="true" *ngIf="db_status == 2"></i>
+          条记录。</span>
+        <a href="javascript:void(0)" (click)="openClearPrompt(content)">清空本地数据库</a>
       </div>
     </div>
   </div>
 </div>
+
+<template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">提示</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>清空数据库后，思海会重新加载。所有的数据都会重新从服务器同步。这可能需要一些时间。</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-danger" (click)="c('OK')">好的</button>
+    <button type="button" class="btn btn-secondary" (click)="c('Close click')">取消</button>
+  </div>
+</template>
